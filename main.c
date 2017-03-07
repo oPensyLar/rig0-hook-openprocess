@@ -27,6 +27,7 @@
 
 #include "stdafx.h"
 #include "proc.h"
+#include "hooks.h"
 
 /*
 
@@ -79,8 +80,7 @@ void Byebye(PDRIVER_OBJECT DriverObject)
     UNICODE_STRING usDosDeviceName;
     RtlInitUnicodeString(&usDosDeviceName, PATHDEVICEDRIVER);
     IoDeleteSymbolicLink(&usDosDeviceName);
-
-    //DbgPrint("BBPass-Driver - Adios oPen");
+    Unhookear();
 }
 
 
@@ -90,12 +90,11 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
 
 	#define MSGOK "1"
-	#define MSGNOTOK "1"
+	#define MSGNOTOK "0"
 	#define WRITE CTL_CODE(FILE_DEVICE_UNKNOWN, 0x00000001, METHOD_BUFFERED, FILE_READ_DATA | FILE_WRITE_DATA)
 
 	NTSTATUS st = STATUS_SUCCESS;
 	PIO_STACK_LOCATION stack;
-	unsigned int escrito;
 	PCHAR inputBuff;
 	char *outputBuff;
 	unsigned int strLen;
@@ -137,7 +136,9 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
 					DbgPrint("BBPass - Dats recividos '%s' longitud '%d' \r\n", inputBuff, pid);
 
-					ListProcess();
+					//ListProcess();
+
+					Hookear();
 
 					//Si hay datos en el Output Buffer
 					if(stack->Parameters.DeviceIoControl.OutputBufferLength>= siz)

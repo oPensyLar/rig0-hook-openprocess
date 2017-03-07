@@ -1,5 +1,0 @@
-1>errors in directory c:\users\opensylarwin\desktop\driver
-1>c:\users\opensylarwin\desktop\driver\proc.c(15) : error C2065: 'QUERY_INFO_PROCESS' : undeclared identifier
-1>c:\users\opensylarwin\desktop\driver\proc.c(15) : error C2146: syntax error : missing ';' before identifier 'MmGetSystemRoutineAddress'
-1>c:\users\opensylarwin\desktop\driver\proc.c(152) : error C2708: 'GetProcessImageName' : actual parameters length in bytes differs from previous call or reference
-1>link : error LNK1181: cannot open input file 'c:\users\opensylarwin\desktop\driver\objchk_win7_x86\i386\proc.obj'

