@@ -1,21 +1,8 @@
 #include "hooks.h"
 
-
-/*
-
-NTSYSAPI NTSTATUS NTAPI ZwOpenProcess (__out PHANDLE ProcessHandle, __in ACCESS_MASK DesiredAccess, __in POBJECT_ATTRIBUTES ObjectAttributes, __in_opt PCLIENT_ID ClientId);
-
-*/
-
-
-//WINBASEAPI __out_opt HMODULE WINAPI LoadLibraryW(__in LPCWSTR lpLibFileName);
-
-WINBASEAPI __out_opt HMODULE WINAPI NewLoadLibray(__in LPCWSTR lpLibFileName)
+NTSTATUS NewZwOpenProcess(OUT PHANDLE ProcessHandle,IN ACCESS_MASK DesiredAccess,IN POBJECT_ATTRIBUTES ObjectAttributes,IN PCLIENT_ID ClientId OPTIONAL)
 {
-
-
-
-/*   HANDLE PID;
+   HANDLE PID;
  
     __try //Utilizamos el bloque try para evitar BSOD
     {
@@ -42,11 +29,9 @@ WINBASEAPI __out_opt HMODULE WINAPI NewLoadLibray(__in LPCWSTR lpLibFileName)
 		//Llamamos a la API nativa y retornamos el resultado correcto
 		return ZwOpenProcessIni(ProcessHandle, DesiredAccess,ObjectAttributes, ClientId); 
 
-*/
+
 
 }
-
-
 
 
 NTSTATUS Unhookear()
@@ -64,28 +49,18 @@ NTSTATUS Unhookear()
 
 
 
-
-
-
-
 NTSTATUS Hookear()
 {
-
-	//Variable que contrendra la direccion que apunta ZwOpenProcess
-	LoadLibrayIni =(TypLoadLibr)(SYSTEMSERVICE(LoadLibraryW));
-
+	ZwOpenProcessIni =(TypZwOpenProc)(SYSTEMSERVICE(ZwOpenProcess));
 
 
  
    //Creamos la MDL para deshabilitar la protección de memoria
-   //MDL = Memory Descriptor List
-   //g_pmdlSystemCall contiene la direccion a reemplazar
    g_pmdlSystemCall = MmCreateMdl(NULL, KeServiceDescriptorTable.ServiceTableBase, KeServiceDescriptorTable.NumberOfServices*4);
 
 
 
-	//Si g_pmdlSystemCall es NULL entonces no tenemos direccion de la funcion a hookear
-	//Salimos
+
    if(!g_pmdlSystemCall)
       return STATUS_UNSUCCESSFUL;
 
@@ -98,9 +73,7 @@ NTSTATUS Hookear()
  
  
    DbgPrint("Hookeando...");
-
-   //HOOK_SYSCALL(API, NuestraFuncion, Direccióninicial);
-   HOOK_SYSCALL( LoadLibraryW, NewLoadLibray, LoadLibrayIni);
+   HOOK_SYSCALL( ZwOpenProcess, NewZwOpenProcess, ZwOpenProcessIni );
  
    return STATUS_SUCCESS;
 }

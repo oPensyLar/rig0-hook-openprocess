@@ -22,6 +22,33 @@
 
 */
 
+
+
+/*
+
+Cm = Configuration manager
+
+Ex = Executive
+	
+Hal = Hardware abstraction layer
+	
+Io = I/O manager
+	
+Ke = Kernel core
+	
+Mm = Memory manager
+	
+Ob = Object manager
+	
+Po = Power manager
+	
+Tm = Transaction manager
+	
+Nt and Zw = Native system services
+
+*/
+
+
 //#include <wdm.h>
 //#include <ntddk.h>
 
