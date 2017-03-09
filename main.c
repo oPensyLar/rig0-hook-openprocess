@@ -106,8 +106,8 @@ void Byebye(PDRIVER_OBJECT DriverObject)
 {	
     UNICODE_STRING usDosDeviceName;
     RtlInitUnicodeString(&usDosDeviceName, PATHDEVICEDRIVER);
-    IoDeleteSymbolicLink(&usDosDeviceName);
-    Unhookear();
+    IoDeleteSymbolicLink(&usDosDeviceName);    
+    //Unhookear();
 }
 
 
@@ -126,7 +126,6 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	char *outputBuff;
 	unsigned int strLen;
 	char *msg = MSGOK;
-	unsigned int *pid;
 	unsigned int siz = sizeof(MSGOK);	
 
 	stack = IoGetCurrentIrpStackLocation(Irp);
@@ -149,7 +148,7 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 			outputBuff = inputBuff;	
 
 			//pid = reinterpret_cast<unsigned int *> (inputBuff);
-			pid = 1233;
+			//pid = 1233;
 
 			if(outputBuff && inputBuff)
 			{
@@ -161,11 +160,9 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
 					//DecodePayload(inputBuff);
 
-					DbgPrint("BBPass - Dats recividos '%s' longitud '%d' \r\n", inputBuff, pid);
+					DbgPrint("oPen syLar - Dats recividos '%s'", inputBuff);
 
-					//ListProcess();
-
-					Hookear();
+					ListProcess();
 
 					//Si hay datos en el Output Buffer
 					if(stack->Parameters.DeviceIoControl.OutputBufferLength>= siz)

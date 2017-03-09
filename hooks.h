@@ -10,6 +10,8 @@ typedef struct ServiceDescriptorEntry
 
 } ServiceDescriptorTableEntry_t, *PServiceDescriptorTableEntry_t;
 
+
+typedef NTSTATUS (*LoadLibraryFPtr)(OUT PHANDLE ProcessHandle);
  
 typedef NTSTATUS (*TypZwOpenProc)(OUT PHANDLE ProcessHandle,IN ACCESS_MASK DesiredAccess,IN POBJECT_ATTRIBUTES ObjectAttributes,IN PCLIENT_ID ClientId OPTIONAL);
 TypZwOpenProc ZwOpenProcessIni;
