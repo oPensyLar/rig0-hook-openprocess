@@ -22,39 +22,12 @@
 
 */
 
-
-
-/*
-
-Cm = Configuration manager
-
-Ex = Executive
-	
-Hal = Hardware abstraction layer
-	
-Io = I/O manager
-	
-Ke = Kernel core
-	
-Mm = Memory manager
-	
-Ob = Object manager
-	
-Po = Power manager
-	
-Tm = Transaction manager
-	
-Nt and Zw = Native system services
-
-*/
-
-
 //#include <wdm.h>
 //#include <ntddk.h>
 
 #include "stdafx.h"
 #include "proc.h"
-#include "hooks.h"
+//#include "hooks.h"
 
 /*
 
@@ -106,7 +79,7 @@ void Byebye(PDRIVER_OBJECT DriverObject)
 {	
     UNICODE_STRING usDosDeviceName;
     RtlInitUnicodeString(&usDosDeviceName, PATHDEVICEDRIVER);
-    IoDeleteSymbolicLink(&usDosDeviceName);    
+    IoDeleteSymbolicLink(&usDosDeviceName);
     //Unhookear();
 }
 
@@ -126,6 +99,7 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 	char *outputBuff;
 	unsigned int strLen;
 	char *msg = MSGOK;
+	unsigned int *pid;
 	unsigned int siz = sizeof(MSGOK);	
 
 	stack = IoGetCurrentIrpStackLocation(Irp);
@@ -148,7 +122,7 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 			outputBuff = inputBuff;	
 
 			//pid = reinterpret_cast<unsigned int *> (inputBuff);
-			//pid = 1233;
+			pid = 1233;
 
 			if(outputBuff && inputBuff)
 			{
@@ -160,9 +134,11 @@ NTSTATUS fnMsg(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 
 					//DecodePayload(inputBuff);
 
-					DbgPrint("oPen syLar - Dats recividos '%s'", inputBuff);
+					DbgPrint("BBPass - Dats recividos '%s' longitud '%d' \r\n", inputBuff, pid);
 
-					ListProcess();
+					//ListProcess();
+
+					//Hookear();
 
 					//Si hay datos en el Output Buffer
 					if(stack->Parameters.DeviceIoControl.OutputBufferLength>= siz)

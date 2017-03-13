@@ -10,11 +10,13 @@ typedef struct ServiceDescriptorEntry
 
 } ServiceDescriptorTableEntry_t, *PServiceDescriptorTableEntry_t;
 
-
-typedef NTSTATUS (*LoadLibraryFPtr)(OUT PHANDLE ProcessHandle);
  
+
+
 typedef NTSTATUS (*TypZwOpenProc)(OUT PHANDLE ProcessHandle,IN ACCESS_MASK DesiredAccess,IN POBJECT_ATTRIBUTES ObjectAttributes,IN PCLIENT_ID ClientId OPTIONAL);
 TypZwOpenProc ZwOpenProcessIni;
+
+
 
 
 
@@ -26,12 +28,15 @@ __declspec(dllimport)  ServiceDescriptorTableEntry_t KeServiceDescriptorTable;
 
 
 
+
 //Macros
 #define SYSTEMSERVICE(_function)  KeServiceDescriptorTable.ServiceTableBase[ *(PULONG)((PUCHAR)_function+1)]
+
 
  
 #define SYSCALL_INDEX(_Function) *(PULONG)((PUCHAR)_Function+1)
  
+
 
 
 #define HOOK_SYSCALL(_Function, _Hook, _Orig )  \

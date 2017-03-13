@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "injector.h"
 
 typedef NTSTATUS (*QUERY_INFO_PROCESS) (
 __in HANDLE ProcessHandle,
@@ -28,3 +27,5 @@ QUERY_INFO_PROCESS ZwQueryInformationProcess;
 BOOLEAN GetProcessName(unsigned int procId);
 unsigned long FindProcess(unsigned int targetPid);
 BOOLEAN ListProcess();
+
+;
